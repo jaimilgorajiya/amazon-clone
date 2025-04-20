@@ -1,22 +1,23 @@
-// scripts/orders/orders.js
 import { getOrders } from '../../data/orders.js';
 import { getProduct } from '../../data/products.js';
 import { getDeliveryOption } from '../../data/deliveryOptions.js';
 import { cart, updateCartQuantity, addToCart } from '../../data/cart.js';
 
+let allOrders = []; // Store full orders list for filtering
+
 // Main function to render orders
 function renderOrders() {
-    const orders = getOrders();
+    allOrders = getOrders();
     const ordersContainer = document.querySelector('.orders-grid');
     
     updateCartQuantity();
 
-    if (!orders.length) {
+    if (!allOrders.length) {
         showEmptyOrdersMessage(ordersContainer);
         return;
     }
 
-    renderOrdersList(orders, ordersContainer);
+    renderOrdersList(allOrders, ordersContainer);
     setupEventListeners();
 }
 
@@ -114,6 +115,7 @@ function calculateDeliveryDate(deliveryDays) {
 function setupEventListeners() {
     setupBuyAgainButtons();
     setupTrackPackageButtons();
+    setupSearchInput(); // ← Add this
 }
 
 // Set up buy again button handlers
@@ -128,27 +130,40 @@ function setupBuyAgainButtons() {
     });
 }
 
-// Set up track package button handlers
-function setupTrackPackageButtons() {
-    document.querySelectorAll('.track-package-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const orderId = button.dataset.orderId;
-            const productId = button.dataset.productId;
-            trackPackage(orderId, productId);
-        });
-    });
-}
-
-
 
 // Handle package tracking
 function trackPackage(orderId, productId) {
-    // Store tracking info in session storage for the tracking page
     sessionStorage.setItem('trackingOrderId', orderId);
     sessionStorage.setItem('trackingProductId', productId);
-    
-    // Redirect to tracking page
     window.location.href = 'tracking.html';
+}
+
+// Filter orders based on search input
+function filterOrders(searchTerm) {
+    const lowerSearch = searchTerm.toLowerCase();
+
+    const filtered = allOrders.filter(order =>
+        order.items.some(item => {
+            const product = getProduct(item.productId);
+            return product.name.toLowerCase().includes(lowerSearch);
+        })
+    );
+
+    const ordersContainer = document.querySelector('.orders-grid');
+
+    if (!filtered.length) {
+        showEmptyOrdersMessage(ordersContainer);
+    } else {
+        renderOrdersList(filtered, ordersContainer);
+    }
+}
+
+// Hook up search input listener
+function setupSearchInput() {
+    const input = document.getElementById('order-search-input');
+    input.addEventListener('input', (e) => {
+        filterOrders(e.target.value);
+    });
 }
 
 // Initialize the page

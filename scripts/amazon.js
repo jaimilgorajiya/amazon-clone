@@ -1,9 +1,8 @@
-// scripts/amazon.js
 import { cart, addToCart, updateCartQuantity } from '../data/cart.js';
 import { products } from '../data/products.js';
 
 let productHTML = '';
-function displayProducts(productsToDisplay) {
+export function displayProducts(productsToDisplay) {
   productHTML = '';
   productsToDisplay.forEach((product) => {
     productHTML += `
@@ -63,7 +62,14 @@ function displayProducts(productsToDisplay) {
       const productId = button.dataset.productId;
       const quantity = button.closest('.product-container').querySelector('.quantity-select').value;
       addToCart(productId, parseInt(quantity)); // Pass quantity to addToCart
-      updateCartQuantity(); // Update the cart quantity
+      updateCartQuantity(); // Update the cart quantity UI
+
+      // Show "Added" confirmation for 1 second
+      const addedMessage = button.closest('.product-container').querySelector('.added-to-cart');
+      addedMessage.classList.add('visible');
+      setTimeout(() => {
+        addedMessage.classList.remove('visible');
+      }, 1000);
     });
   });
 }
