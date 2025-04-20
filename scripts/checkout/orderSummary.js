@@ -1,24 +1,22 @@
 import { cart, deleteItem, updateDeliveryOption } from '../../data/cart.js';
 import { products, getProduct } from '../../data/products.js';
 import { deliveryOptions , getDeliveryOption } from '../../data/deliveryOptions.js';
-import { renderPaymentSummary } from './paymentSummary.js'; 
+import { renderPaymentSummary } from './paymentSummary.js';
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
 
   cart.forEach((cartItem) => {
     const productId = cartItem.productId;
-
     const matchingProduct = getProduct(productId);
 
     // Check if the product exists
     if (!matchingProduct) {
       console.error(`Product with ID ${productId} not found.`);
-      return; // Skip this item if the product is not found
+      return;
     }
 
     const deliveryOptionId = cartItem.deliveryOptionId;
-
     const deliveryOption = getDeliveryOption(deliveryOptionId);
 
     const today = dayjs();
@@ -45,7 +43,7 @@ export function renderOrderSummary() {
               <span>
                 Quantity: <span class="quantity-label">${cartItem.quantity}</span>
               </span>
-              <span class="update-quantity-link link-primary">
+              <span class="update-quantity-link link-primary" data-product-id="${matchingProduct.id}">
                 Update
               </span>
               <span class="delete-quantity-link link-primary" data-product-id="${matchingProduct.id}">
@@ -67,6 +65,7 @@ export function renderOrderSummary() {
 
   document.querySelector('.order-summary').innerHTML = cartSummaryHTML;
 
+  // Delete functionality
   document.querySelectorAll('.delete-quantity-link').forEach((deleteLink) => {
     deleteLink.addEventListener('click', () => {
       const productId = deleteLink.dataset.productId;
@@ -77,12 +76,43 @@ export function renderOrderSummary() {
     });
   });
 
+  // Delivery option update
   document.querySelectorAll('.js-delivery-option').forEach((input) => {
     input.addEventListener('click', () => {
       const { productId, deliveryOptionId } = input.dataset;
       updateDeliveryOption(productId, deliveryOptionId);
       renderOrderSummary();
       renderPaymentSummary();
+    });
+  });
+
+  // Update quantity functionality
+  document.querySelectorAll('.update-quantity-link').forEach((updateLink) => {
+    updateLink.addEventListener('click', () => {
+      const quantityContainer = updateLink.closest('.product-quantity');
+      const quantityLabel = quantityContainer.querySelector('.quantity-label');
+      const currentQuantity = quantityLabel.textContent;
+      const productId = updateLink.dataset.productId;
+
+      // Replace quantity display with input and save button
+      quantityContainer.innerHTML = `
+        <input type="number" min="1" value="${currentQuantity}" class="quantity-input">
+        <button class="save-quantity-button link-primary">Save</button>
+      `;
+
+      quantityContainer.querySelector('.save-quantity-button').addEventListener('click', () => {
+        const newQuantity = parseInt(quantityContainer.querySelector('.quantity-input').value);
+
+        if (newQuantity > 0) {
+          // Update quantity in cart
+          const cartItem = cart.find(item => item.productId === productId);
+          cartItem.quantity = newQuantity;
+
+          // Re-render
+          renderOrderSummary();
+          renderPaymentSummary();
+        }
+      });
     });
   });
 }
@@ -95,9 +125,9 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
     const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
     const dateString = deliveryDate.format('dddd, MMMM D');
 
-    const priceString = deliveryOption.priceCent === 0
+    const priceString = deliveryOption.priceCents === 0
       ? 'FREE'
-      : `$${(deliveryOption.priceCent / 100).toFixed(2)} - `;
+      : `$${(deliveryOption.priceCents / 100).toFixed(2)} - `;
 
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
