@@ -56,15 +56,13 @@ export function displayProducts(productsToDisplay) {
   });
   document.querySelector('.products-grid').innerHTML = productHTML;
 
-  // Add event listeners for add-to-cart buttons
   document.querySelectorAll('.add-to-cart-button').forEach((button) => {
     button.addEventListener('click', () => {
       const productId = button.dataset.productId;
       const quantity = button.closest('.product-container').querySelector('.quantity-select').value;
-      addToCart(productId, parseInt(quantity)); // Pass quantity to addToCart
-      updateCartQuantity(); // Update the cart quantity UI
+      addToCart(productId, parseInt(quantity)); 
+      updateCartQuantity(); 
 
-      // Show "Added" confirmation for 1 second
       const addedMessage = button.closest('.product-container').querySelector('.added-to-cart');
       addedMessage.classList.add('visible');
       setTimeout(() => {
@@ -76,7 +74,6 @@ export function displayProducts(productsToDisplay) {
 
 displayProducts(products);
 
-// Search functionality
 document.querySelector('.search-bar').addEventListener('input', (event) => {
   const query = event.target.value.toLowerCase();
   const filteredProducts = products.filter((product) => {

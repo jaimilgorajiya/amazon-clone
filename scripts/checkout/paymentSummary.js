@@ -12,7 +12,6 @@ export function renderPaymentSummary() {
         const product = getProduct(cartItem.productId);
         const deliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
 
-        // Debugging: check values
         if (!product || typeof product.priceCents !== 'number') {
             console.error('Invalid product data for:', cartItem.productId, product);
             return;

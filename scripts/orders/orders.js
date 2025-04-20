@@ -3,9 +3,7 @@ import { getProduct } from '../../data/products.js';
 import { getDeliveryOption } from '../../data/deliveryOptions.js';
 import { cart, updateCartQuantity, addToCart } from '../../data/cart.js';
 
-let allOrders = []; // Store full orders list for filtering
-
-// Main function to render orders
+let allOrders = []; 
 function renderOrders() {
     allOrders = getOrders();
     const ordersContainer = document.querySelector('.orders-grid');
@@ -21,7 +19,6 @@ function renderOrders() {
     setupEventListeners();
 }
 
-// Show message when no orders exist
 function showEmptyOrdersMessage(container) {
     container.innerHTML = `
         <div class="empty-orders-message">
@@ -31,7 +28,6 @@ function showEmptyOrdersMessage(container) {
     `;
 }
 
-// Render the list of orders
 function renderOrdersList(orders, container) {
     container.innerHTML = orders.map(order => `
         <div class="order-container">
@@ -41,7 +37,6 @@ function renderOrdersList(orders, container) {
     `).join('');
 }
 
-// Render the order header section
 function renderOrderHeader(order) {
     const orderDate = new Date(order.orderDate);
     const formattedDate = orderDate.toLocaleDateString('en-US', {
@@ -70,7 +65,6 @@ function renderOrderHeader(order) {
     `;
 }
 
-// Render all items in an order
 function renderOrderItems(order) {
     return order.items.map(item => {
         const product = getProduct(item.productId);
@@ -101,7 +95,6 @@ function renderOrderItems(order) {
     }).join('');
 }
 
-// Calculate and format delivery date
 function calculateDeliveryDate(deliveryDays) {
     const date = new Date();
     date.setDate(date.getDate() + deliveryDays);
@@ -111,14 +104,12 @@ function calculateDeliveryDate(deliveryDays) {
     });
 }
 
-// Set up all event listeners
 function setupEventListeners() {
     setupBuyAgainButtons();
     setupTrackPackageButtons();
-    setupSearchInput(); // ← Add this
+    setupSearchInput(); 
 }
 
-// Set up buy again button handlers
 function setupBuyAgainButtons() {
     document.querySelectorAll('.buy-again-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -131,14 +122,12 @@ function setupBuyAgainButtons() {
 }
 
 
-// Handle package tracking
 function trackPackage(orderId, productId) {
     sessionStorage.setItem('trackingOrderId', orderId);
     sessionStorage.setItem('trackingProductId', productId);
     window.location.href = 'tracking.html';
 }
 
-// Filter orders based on search input
 function filterOrders(searchTerm) {
     const lowerSearch = searchTerm.toLowerCase();
 
@@ -158,7 +147,6 @@ function filterOrders(searchTerm) {
     }
 }
 
-// Hook up search input listener
 function setupSearchInput() {
     const input = document.getElementById('order-search-input');
     input.addEventListener('input', (e) => {
@@ -166,5 +154,4 @@ function setupSearchInput() {
     });
 }
 
-// Initialize the page
 renderOrders();

@@ -10,7 +10,6 @@ export function renderOrderSummary() {
     const productId = cartItem.productId;
     const matchingProduct = getProduct(productId);
 
-    // Check if the product exists
     if (!matchingProduct) {
       console.error(`Product with ID ${productId} not found.`);
       return;
@@ -65,7 +64,6 @@ export function renderOrderSummary() {
 
   document.querySelector('.order-summary').innerHTML = cartSummaryHTML;
 
-  // Delete functionality
   document.querySelectorAll('.delete-quantity-link').forEach((deleteLink) => {
     deleteLink.addEventListener('click', () => {
       const productId = deleteLink.dataset.productId;
@@ -76,7 +74,6 @@ export function renderOrderSummary() {
     });
   });
 
-  // Delivery option update
   document.querySelectorAll('.js-delivery-option').forEach((input) => {
     input.addEventListener('click', () => {
       const { productId, deliveryOptionId } = input.dataset;
@@ -86,7 +83,6 @@ export function renderOrderSummary() {
     });
   });
 
-  // Update quantity functionality
   document.querySelectorAll('.update-quantity-link').forEach((updateLink) => {
     updateLink.addEventListener('click', () => {
       const quantityContainer = updateLink.closest('.product-quantity');
@@ -94,7 +90,6 @@ export function renderOrderSummary() {
       const currentQuantity = quantityLabel.textContent;
       const productId = updateLink.dataset.productId;
 
-      // Replace quantity display with input and save button
       quantityContainer.innerHTML = `
         <input type="number" min="1" value="${currentQuantity}" class="quantity-input">
         <button class="save-quantity-button link-primary">Save</button>
@@ -104,11 +99,9 @@ export function renderOrderSummary() {
         const newQuantity = parseInt(quantityContainer.querySelector('.quantity-input').value);
 
         if (newQuantity > 0) {
-          // Update quantity in cart
           const cartItem = cart.find(item => item.productId === productId);
           cartItem.quantity = newQuantity;
 
-          // Re-render
           renderOrderSummary();
           renderPaymentSummary();
         }
